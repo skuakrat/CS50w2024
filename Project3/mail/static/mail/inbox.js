@@ -5,11 +5,33 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#submit').addEventListener('click', submit);
+
 
   // By default, load the inbox
   load_mailbox('inbox');
 
+  //compose submit
+function submit() {
+  
+  const recipients = document.querySelector('#compose-recipients').value;
+  const subject = document.querySelector('#compose-subject').value;
+  const body = document.querySelector('#compose-body').value;
+
+  fetch('/emails', {
+    method: 'POST',
+    body: JSON.stringify({
+      recipients: recipients,
+      subject: subject,
+      body: body,
+    })
+  })
+  load_mailbox('sent');
+}
+
 });
+
+
 
 
 function compose_email() {
@@ -23,41 +45,6 @@ function compose_email() {
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
-
-  //compose submit
-  document.querySelector('#submit').addEventListener('click', function submit() {
-    const recipients = document.querySelector('#compose-recipients').value;
-    const subject = document.querySelector('#compose-subject').value;
-    const body = document.querySelector('#compose-body').value;
-
-    fetch(`/emails`, {
-      method: 'POST',
-      body: JSON.stringify({
-        recipients: recipients,
-        subject: subject,
-        body: body,
-      })
-    })
-    .then(response => response.json())
-    /*
-    .then(result => {        
-      let composeAlert = document.querySelector('#composeAlert');
-      if (result.error) {  
-        composeAlert.style.display = 'block';
-        composeAlert.className = 'alert alert-danger';
-        composeAlert.innerHTML = result.error;
-        console.log(result);
-        return false;
-      } else {
-        composeAlert.style.display = 'none';
-        load_mailbox('sent');
-        console.log(result);
-        return false;
-      }
-      
-    })
-    */
-  });
 
 }
 

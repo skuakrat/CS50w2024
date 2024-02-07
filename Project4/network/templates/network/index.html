@@ -1,0 +1,51 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+<h2 id="title">All post</h2>
+{% if user.is_authenticated %}
+<div id="profile-view">
+    <div id="profile-view" class="card p-3 bg-light">
+        <div id="alert"></div>
+        <h4 id="profile"></h4>
+        <p class="card-text" >Followers: <span id="followers_no"></span></p>
+        <p class="card-text" >Followers list: <span id="followers_list"></span></p>
+        <p class="card-text" >Followings: <span id="followings_no"></span></p>
+        <p class="card-text" >Followings list: <span id="followings_list"></span></p>
+        <a href="#" class="card-link" id="followed"></a>
+    </div>
+    <hr>
+    <h2>Posts by user</h3>
+</div>
+
+
+<div id="compose-view" class="card p-3">
+    <div id="alert"></div>
+    <h4>New Post</h4>
+    <form id="compose-form">
+        <textarea class="form-control" id="compose-body" placeholder="Write your post here..."></textarea>
+        <input id="submit" type="submit" class="btn btn-primary"/>
+    </form>
+</div>
+{% endif %}
+
+
+
+
+
+
+<div id="posts-view">
+</div>
+
+<div id="paging">
+</div>
+
+
+{% endblock %}
+
+
+
+
+{% block script %}
+    <script src="{% static 'network/inbox.js' %}"></script>
+{% endblock %}

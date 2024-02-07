@@ -1,0 +1,21 @@
+.nav-item {
+    cursor: pointer;
+}
+
+.card-title {
+    cursor: pointer;
+}
+
+i {
+    cursor: pointer; 
+}
+
+.link {
+    cursor: pointer;
+    color: blue;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+

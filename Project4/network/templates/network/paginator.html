@@ -1,0 +1,49 @@
+
+{% load static %}
+{% block paginator %}
+<div id="pagination"></div>
+
+
+<nav aria-label="...">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item" onclick="goto('{{type}}', 1)">
+            <span class="page-link">
+              <span aria-hidden="true">&laquo;</span>
+              <span class="sr-only">Previous</span>
+            </span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+        {% endif %}
+
+        {% for i in range(5) %}
+        <li class="page-item"><a class="page-link" href="#">{{ i }}</a></li>
+        {% endfor %}
+
+
+
+
+        <li class="page-item"><a class="page-link" href="#">{{pagetotal}}</a></li>
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">
+            2
+            <span class="sr-only">(current)</span>
+            </span>
+        </li>
+        <li class="page-item"><span class="page-link">3</span></li>
+
+
+        <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+        </li>
+        <li class="page-item" onclick="goto('{{type}}', '{{ page_obj.paginator.num_pages }}')">
+            <span class="page-link">
+              <span aria-hidden="true">&raquo;</span>
+              <span class="sr-only">Next</span>
+            </span>
+        </li>
+    </ul>
+</nav>
+{% endblock %}

@@ -22,7 +22,6 @@ def index(request):
     
 def profile(request, username):
     type = username
-    load_post(request, type)
     user = get_object_or_404(User, username=username)
 
     if request.user.is_authenticated:
@@ -163,6 +162,7 @@ def edit(request, post_id):
 
 
 def load_post(request, type, page):
+    
 
     if request.user.is_authenticated:
 
@@ -181,8 +181,7 @@ def load_post(request, type, page):
             )
         
         posts = posts.order_by("-timestamp").all()
-        posts_total = posts.count
-        paginator = Paginator(posts, 5) # Show 5 per page.
+        paginator = Paginator(posts, 10) # Show 10 per page.
         page_number = page
         page_obj = paginator.get_page(page_number)
         return JsonResponse([post.serialize() for post in page_obj], safe=False)
@@ -190,8 +189,11 @@ def load_post(request, type, page):
     else:
         posts = Post.objects.all()
         posts = posts.order_by("-timestamp").all()
-
-        return JsonResponse([post.serialize() for post in posts], safe=False)
+        posts = posts.order_by("-timestamp").all()
+        paginator = Paginator(posts, 10) # Show 10 per page.
+        page_number = page
+        page_obj = paginator.get_page(page_number)
+        return JsonResponse([post.serialize() for post in page_obj], safe=False)
     
 
 
@@ -214,10 +216,11 @@ def page(request, type, page):
             )
         
         posts = posts.order_by("-timestamp").all()
-        paginator = Paginator(posts, 5) # Show 5 per page.
+        paginator = Paginator(posts, 10) # Show 10 per page.
         page_number = page
         page_obj = paginator.get_page(page_number)
-        pagetotal = range(page_obj.paginator.num_pages)
+        original_pagetotal = range(page_obj.paginator.num_pages)
+        pagetotal = [i + 1 for i in original_pagetotal]
         return render(request, 'network/paginator.html', {
             'page_obj': page_obj,
             'type': type,
@@ -227,8 +230,16 @@ def page(request, type, page):
     else:
         posts = Post.objects.all()
         posts = posts.order_by("-timestamp").all()
-
-        return render(request, 'network/paginator.html', {'page_obj': page_obj})
+        paginator = Paginator(posts, 10) # Show 10 per page.
+        page_number = page
+        page_obj = paginator.get_page(page_number)
+        original_pagetotal = range(page_obj.paginator.num_pages)
+        pagetotal = [i + 1 for i in original_pagetotal]
+        return render(request, 'network/paginator.html', {
+            'page_obj': page_obj,
+            'type': type,
+            'pagetotal': pagetotal
+            })
 
 
 

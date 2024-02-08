@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let thisuserid = document.querySelector('#thisuser');
     if (thisuserid) {
         const thisuser = document.querySelector('#thisuser').innerHTML;
-        document.querySelector('#thisuser').addEventListener('click', () => {profile(thisuser); load_post(thisuser); });
-        document.querySelector('#follow').addEventListener('click', () => load_post('follow'));
+        document.querySelector('#thisuser').addEventListener('click', () => {profile(thisuser); goto(thisuser, 1); });
+        document.querySelector('#follow').addEventListener('click', () => {goto('follow', 1)});
         document.querySelector('#submit').addEventListener('click', submit);
     }
 
@@ -15,8 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //Pagination
 function goto(type, page_number) {
-    load_post(type, page_number)
     page(type, page_number)
+    load_post(type, page_number)
+    
 }
 
 
@@ -36,54 +37,7 @@ function page(type, page_number) {
                 document.getElementById('paging').innerHTML = html;
             })
             .catch(error => console.error('Error fetching webpage:', error));
-
- /*
-
-    document.querySelector('#pagination').innerHTML = `
-    <div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div>`
-
-
-   
-    fetch(`/page/${type}/${page_number}`)
-    .then(response => response.json())
-    .then(posts => {
-        posts.forEach(post => {
-            const div = document.createElement('div');
-            div.innerHTML = 
-                `<div class="card p-3 m-1">
-                    <h5 class="card-title" id="user-${post.id}">${post.user}</h5>
-                    <p class="card-text" id="body-${post.id}">${post.body}</p>
-                    <p class="card-subtitle mb-2 text-muted" id="heart-${post.id}"><i class="fa-regular fa-heart" id="like-${post.id}"></i><i class="fa-solid fa-heart" style="color:red" id="unlike-${post.id}"></i> <span id="num-${post.id}">${post.likes}</span></p>
-                    <p class="card-text">
-                    <small class="text-muted">
-                        Posted on ${post.timestamp}; post-id: ${post.id}
-                        <span id="closebutton-${post.id}" class="link">(close)</span>
-                        <span id="editbutton-${post.id}" class="link">(edit)</span>
-                    </small>
-                    </p>
-                </div>`;
-        })
-    })
-    */
-
 }
-
 
 
 // Load all posts

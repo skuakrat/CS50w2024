@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"path": "../../../../../django/lecture3"
+		},
+		{
+			"path": "../../../../../Project0-old"
+		}
+	],
+	"settings": {}
+}

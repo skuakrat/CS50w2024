@@ -50,6 +50,11 @@ def compose(request):
 
     # Get contents of email
     subject = data.get("subject", "")
+    if not subject:
+        return JsonResponse({
+            "error": "Subject required."
+        }, status=400)
+
     body = data.get("body", "")
 
     # Create one email for each recipient, plus sender
@@ -78,15 +83,15 @@ def mailbox(request, mailbox):
     # Filter emails returned based on mailbox
     if mailbox == "inbox":
         emails = Email.objects.filter(
-            recipients=request.user, archived=False
+            user=request.user, recipients=request.user, archived=False
         )
     elif mailbox == "sent":
         emails = Email.objects.filter(
-            sender=request.user
+            user=request.user, sender=request.user
         )
     elif mailbox == "archive":
         emails = Email.objects.filter(
-            recipients=request.user, archived=True
+            user=request.user, recipients=request.user, archived=True
         )
     else:
         return JsonResponse({"error": "Invalid mailbox."}, status=400)
@@ -118,7 +123,7 @@ def email(request, email_id):
         if data.get("archived") is not None:
             email.archived = data["archived"]
         email.save()
-        return HttpResponse(status=204)
+        # return HttpResponse(status=204)
 
     # Email must be via GET or PUT
     else:

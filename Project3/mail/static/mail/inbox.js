@@ -11,8 +11,35 @@ document.addEventListener('DOMContentLoaded', function() {
   // By default, load the inbox
   load_mailbox('inbox');
 
-  //compose submit
-function submit() {
+
+
+
+});
+
+
+function compose_email() {
+
+  // Show compose view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#alert').style.display = 'none';
+  document.querySelector('#reply-view').style.display = 'none';
+
+  // Clear out composition fields
+  document.querySelector('#compose-recipients').value = '';
+  document.querySelector('#compose-subject').value = '';
+  document.querySelector('#compose-body').value = '';
+
+}
+
+
+
+//compose submit
+
+function submit(event) {
+
+  event.preventDefault() 
   
   const recipients = document.querySelector('#compose-recipients').value;
   const subject = document.querySelector('#compose-subject').value;
@@ -26,33 +53,32 @@ function submit() {
       body: body,
     })
   })
-  load_mailbox('sent');
+  .then(response => response.json())
+  .then(result => {        
+    if (result.error) {  
+      console.log(result);
+      document.querySelector('#alert').innerHTML = '';
+      document.querySelector('#alert').style.display = 'block';
+      const alert = document.createElement('div');
+      alert.innerHTML = result.error;
+      alert.className = "alert alert-danger";
+      document.querySelector('#alert').append(alert);
+      return false;
+    } else {
+      load_mailbox('sent');
+    }
+  })
+  
 }
 
-});
 
-
-
-
-function compose_email() {
-
-  // Show compose view and hide other views
-  document.querySelector('#emails-view').style.display = 'none';
-  document.querySelector('#email-view').style.display = 'none';
-  document.querySelector('#compose-view').style.display = 'block';
-
-  // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
-
-}
 
 function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#reply-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -109,6 +135,7 @@ function load_mail(id) {
 
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'block';
+  document.querySelector('#reply-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#email-view').innerHTML = '';
   const userEmail = document.querySelector('#userEmail').innerHTML;
@@ -136,7 +163,7 @@ function load_mail(id) {
         <b>Message:</b>
         </div>
         <div class="py-3 container ">
-        ${email.body}
+        ${email.body.replace(/\n/g,"<br>")}
         </div>
         `;
       document.querySelector('#email-view').append(div);
@@ -185,5 +212,63 @@ function load_mail(id) {
       div2.className = "ml-1 btn btn-sm btn-outline-primary";
       div2.innerHTML = "Reply";
       document.querySelector('#email-view').append(div2);
+
+      div2.addEventListener('click', () => {
+
+        document.querySelector('#reply-view').style.display = 'block';
+        document.querySelector('#reply-recipients').value = email.sender;
+        if (email.subject.startsWith("Re:")) { 
+          document.querySelector('#reply-subject').value = email.subject;
+        } else {
+          document.querySelector('#reply-subject').value = `Re: ${email.subject}`;
+        }
+       
+        document.querySelector('#reply-body').value = `
+
+
+
+---------- Original message ----------
+From: ${email.sender}
+To: ${email.recipients}
+On: ${email.timestamp}
+Subject: ${email.timestamp}
+Message:
+
+${email.body}`;
+
+        document.querySelector('#reply-button').addEventListener('click', reply);
+
+
+      });
   })
+}
+
+//reply submit
+
+function reply(event) {
+
+  event.preventDefault() 
+  
+  const recipients = document.querySelector('#reply-recipients').value;
+  const subject = document.querySelector('#reply-subject').value;
+  const body = document.querySelector('#reply-body').value;
+
+  fetch('/emails', {
+    method: 'POST',
+    body: JSON.stringify({
+      recipients: recipients,
+      subject: subject,
+      body: body,
+    })
+  })
+  .then(response => response.json())
+  .then(result => {        
+    if (result.error) {  
+
+      return false;
+    } else {
+      load_mailbox('sent');
+    }
+  })
+  
 }

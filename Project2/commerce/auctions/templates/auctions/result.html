@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    
+<h2>Result</h2> 
+
+{% if message %}
+    {% if danger %}
+        <div class="alert alert-danger" role="alert">
+            {{ message}}
+        </div>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+        {{ message}}
+    </div>
+    {% endif %}
+{% endif %}
+
+<a href="{% url 'listing' id %}"><button class="btn btn-dark">Back to listing</button></a>
+
+{% endblock %}

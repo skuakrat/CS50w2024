@@ -1,0 +1,193 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {% if message %}
+        {% if danger %}
+            <div class="alert alert-danger" role="alert">
+                {{ message}}
+            </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+            {{ message}}
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% if winbid and list.status == 0 %}
+        {% if winbid.bidder.id == request.user.id %}
+            <br>
+            <div class="card text-center">
+                <div class="card-header">
+                <h1 class="card-title">Congrats!</h5>
+                <p class="card-text">You've won this bid!</p>
+
+                </div>
+            </div><br><br>
+
+        {% endif %}
+
+    {% endif %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% if list.url %}
+                    <img src="{{ list.url }}" style="width: 400px;">
+                {% else %}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" style="width: 400px;">
+                {% endif %}
+                
+            </div>
+            <div class="col">
+                <h2>{{list.title}} <span style="font-size: 16px;">by {{list.owner}}</span></h2>
+                {% if check_watch %}
+
+                
+
+                    <p><a href="{% url 'unwatch' list.id %}">Remove from watchlist</a></p> 
+
+                {% else %}
+                    <p><a href="{% url 'watch' list.id %}">Add to watchlist</a></p> 
+                {% endif %}
+
+                    <ul>
+                        <li>Description: {{list.description}}</li>
+                        <li>Starting bid: ${{list.firstbid}}</li>
+                        
+                    {% if list.status == 1 %}
+                        <li>Status: <b style="color: green;">Active </b></li>
+                        <li>Current bid: 
+                            {% for bidlist in bidlists %}
+                                {% if forloop.first %}
+                                    {% if bidlist.bid != list.firstbid %}
+                                        ${{ bidlist.bid }} by {{bidlist.bidder}}
+                                    {% else %}
+                                        No bid yet
+                                    {% endif %}
+                                {% endif %}
+                            {% empty %}
+                                No bid yet
+                            {% endfor %}
+                        </li>
+                        </ul>
+
+                        {% if list.owner == request.user %}
+
+                            <form method="GET" action="{% url 'close' list.id %}">
+                                <button type="submit" class="btn btn-dark">Close</button>    
+                            </form><br>
+
+                        {% else %}
+
+
+
+                            <form method="POST" action="{% url 'listing' list.id %}">
+                                {% csrf_token %}
+
+                                <label for="bid">bid ($):</label><br>
+
+                                {% for bidlist in bidlists %}
+                                    {% if forloop.first %}
+                                        <input type="number" required name="bid" min="{{ bidlist.bid }}" value="{{ bidlist.bid }}" step="{{ list.firstbid }}">
+
+                                    {% endif %}
+                                {% empty %}
+                                    <input type="number" required name="bid" min="{{ list.firstbid }}" value="{{ list.firstbid }}" step="{{ list.firstbid }}">
+                                {% endfor %}
+
+                                <button type="submit" class="btn btn-dark">Submit</button><br>
+                                <span style="font-size: 10px;">*bid must be at least as large as the starting bid, and must be greater than any other bids that have been placed (if any).</span>
+                        
+                            </form><br>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <li>Status: <b style="color: red;">Inactive</b> </li>
+
+                        <li>Winner: 
+                            {% for bidlist in bidlists %}
+                                {% if forloop.first %}
+                                    {% if bidlist.bid != list.firstbid %}
+                                        ${{ bidlist.bid }} by {{bidlist.bidder}}
+                                    {% else %}
+                                        No bid yet
+                                    {% endif %}
+                                {% endif %}
+                            {% empty %}
+                                No bid yet
+                            {% endfor %}
+                        </li>
+                        </ul>
+
+                    {% endif %}
+
+                
+
+                    <div class="card">
+                        <div class="card-header">
+                          <B>Bid History:</B>
+                        </div>
+                        <ul class="list-group list-group-flush">                        
+                            <li class="list-group-item">Current bid: 
+                                {% for bidlist in bidlists %}
+                                    {% if forloop.first %}
+                                        {% if bidlist.bid != list.firstbid %}
+                                            ${{ bidlist.bid }} by {{bidlist.bidder}}
+                                        {% else %}
+                                            No bid yet
+                                        {% endif %}
+                                    {% endif %}
+                                {% empty %}
+                                    No bid yet
+                                {% endfor %}
+                                        </li>
+                                {% for bidlist in bidlists %}
+                                    {% if not forloop.first %}
+                                        <li class="list-group-item">History: ${{ bidlist.bid }} by {{ bidlist.bidder }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                        </ul>
+                      </div>
+
+
+            </div>
+        </div>
+    </div><br><br>
+
+    <hr class="hr" />
+
+    <center>
+        <h3>Comments:</h3>
+        <span style="font-size: 16px;">From oldest to latest</span><br><br><br>
+    </center>
+
+    {% if comments %}
+        {% for comment in comments %}
+
+    <div class="card text-dark text-center bg-light mx-auto" style="max-width: 70rem;">
+        <div class="card-header"><b>{{comment.owner}}</b> commented:</div>
+        <div class="card-body">
+          <p class="card-text">{{comment.comment}}</p>
+        </div>
+      </div><br>
+
+      {% endfor %}
+
+    {% endif %}
+
+      <div class="card text-dark text-center bg-light mx-auto " style="max-width: 70rem;">
+        <div class="card-body">
+          <h3 class="card-title"><b>Add comment:</b></h3>
+          <form action="{% url 'comment' list.id %}" method="POST">
+            {% csrf_token %}
+            <textarea id="story" name="comment" rows="5" cols="60" required></textarea><br>
+            <button type="submit" class="btn btn-dark">Comment</button>  
+        </form>
+        </div>
+      </div><br>
+
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    
+
+    <h2>{{h2}}</h2> 
+
+    {% if message %}
+        {% if danger %}
+            <div class="alert alert-danger" role="alert">
+                {{ message}}
+            </div>
+        {% else %}
+        <div class="alert alert-success" role="alert">
+            {{ message}}
+        </div>
+        {% endif %}
+    {% endif %}
+
+
+
+
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for listing in listings %}
+        <div class="col">
+          <div class="card">
+            <div style="height: 200px; overflow: hidden; padding: 5px;">
+                {% if listing.url %}
+                <img src="{{listing.url}}" class="card-img-top" style="width: 100%; height: 100%; object-fit: contain;">
+                {% else %}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" class="card-img-top" style="width: 100%; height: 100%; object-fit: contain;">
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'listing' listing.id %}">{{listing.title}}</a><span style="font-size: 16px;"> by {{listing.owner}}</span></h5>
+                <p class="card-text">
+                Category: <a href="{% url 'categoryid' listing.category.id %}">{{ listing.category }}</a>
+                </p>
+                <p class="card-text">
+                Description: {{ listing.description }} 
+                </p>
+                <span>
+                    Starting bid: ${{ listing.firstbid }} 
+
+                    <p>Current bid: <b>
+                        {% if listing.latest_bid and listing.latest_bid != listing.firstbid %}
+                        ${{ listing.latest_bid|floatformat:2 }}
+                        {% else %}
+                            No bid yet.
+                        {% endif %}
+                    </b></p>
+
+                </span>
+
+                <a href="{% url 'listing' listing.id %}"><button type="button" class="align-self-end btn btn-lg btn-block btn-dark" style="margin-top: 20px;">Bid this</button></a>
+
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <li>No active listings.</li>
+        {% endfor %}
+    </div>
+
+{% endblock %}
